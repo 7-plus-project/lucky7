@@ -1,5 +1,6 @@
 package com.example.lucky7.domain.common.dto;
 
+import com.example.lucky7.domain.user.enums.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

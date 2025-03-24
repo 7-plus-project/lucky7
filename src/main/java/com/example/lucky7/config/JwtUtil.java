@@ -1,6 +1,7 @@
 package com.example.lucky7.config;
 
 import com.example.lucky7.domain.common.exception.ServerException;
+import com.example.lucky7.domain.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
