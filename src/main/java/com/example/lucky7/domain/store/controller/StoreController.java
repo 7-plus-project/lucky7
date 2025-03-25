@@ -3,6 +3,7 @@ package com.example.lucky7.domain.store.controller;
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
+import com.example.lucky7.domain.store.dto.response.StoreLocationListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.service.StoreService;
 import com.example.lucky7.domain.user.enums.UserRole;
@@ -38,6 +39,18 @@ public class StoreController {
             // todo 검색 키워드 추가하기
     ){
         return ResponseEntity.ok(storeService.findStores(page,size, startDate, endDate));
+    }
+
+    /* MYSQL 위치 검색 - 메서드 추가 */
+    @GetMapping("/location")
+    public ResponseEntity<StoreLocationListResponse> getStoresLocation(
+             @RequestParam(value = "lon") double lon,
+             @RequestParam(value = "lat") double lat,
+             @RequestParam(value = "range") double range) {
+        StoreLocationListResponse storeList = storeService.findStoresLocation(lon, lat, range);
+        if (storeList.isEmpty())
+            return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(storeList);
     }
 
     @GetMapping("/{storeId}")
