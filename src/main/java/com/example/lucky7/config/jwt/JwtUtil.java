@@ -1,4 +1,4 @@
-package com.example.lucky7.config;
+package com.example.lucky7.config.jwt;
 
 import com.example.lucky7.domain.common.exception.ServerException;
 import com.example.lucky7.domain.user.enums.UserRole;

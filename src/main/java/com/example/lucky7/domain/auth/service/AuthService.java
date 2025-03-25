@@ -1,6 +1,6 @@
 package com.example.lucky7.domain.auth.service;
 
-import com.example.lucky7.config.JwtUtil;
+import com.example.lucky7.config.jwt.JwtUtil;
 import com.example.lucky7.domain.auth.dto.request.SigninRequest;
 import com.example.lucky7.domain.auth.dto.request.SignupRequest;
 import com.example.lucky7.domain.auth.dto.response.SigninResponse;
