@@ -7,14 +7,17 @@ import com.example.lucky7.domain.store.dto.response.StoreListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.repository.StoreRepository;
+import com.example.lucky7.external.kakao.Coordinate;
+import com.example.lucky7.external.kakao.KakaoMapClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -23,14 +26,18 @@ import java.time.LocalDateTime;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final KakaoMapClient kakaoMapClient;
 
     @Transactional
     public StoreResponse save(StoreCreateRequest request) {
+        Coordinate coord = kakaoMapClient.geocode(request.getAddress());
 
         Store store = new Store(
                 request.getName(),
                 request.getAddress(),
-                request.getCategory()
+                request.getCategory(),
+                coord.latitude(),
+                coord.longitude()
         );
 
         Store savedStore = storeRepository.save(store);
@@ -38,16 +45,24 @@ public class StoreService {
         return StoreResponse.toDto(savedStore);
 
     }
+    public Page<StoreListResponse> searchStoresByDistance(String address, int distanceKm, int page, int size) {
+        Coordinate userLocation = kakaoMapClient.geocode(address);
 
-    public Page<StoreListResponse> findStores(int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        List<Store> allStores = storeRepository.findAll();
 
-        Page<Store> stores = storeRepository.findAllByOrderByModifiedAtDesc(pageable, startDate, endDate);
+        List<StoreListResponse> filtered = allStores.stream()
+                .filter(store -> calculateDistance(
+                        userLocation.latitude(), userLocation.longitude(),
+                        store.getLatitude(), store.getLongitude()
+                ) <= distanceKm)
+                .map(StoreListResponse::from)
+                .toList();
 
-        return stores.map(store -> new StoreListResponse(
-                store.getId(),
-                store.getName()
-        ));
+        int fromIndex = Math.min((page - 1) * size, filtered.size());
+        int toIndex = Math.min(fromIndex + size, filtered.size());
+        List<StoreListResponse> pageContent = filtered.subList(fromIndex, toIndex);
+
+        return new PageImpl<>(pageContent, PageRequest.of(page - 1, size), filtered.size());
     }
 
     public StoreResponse findStore(Long storeId) {
@@ -79,4 +94,14 @@ public class StoreService {
         store.deleteStore(LocalDateTime.now());
     }
 
+    private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
+        final int EARTH_RADIUS = 6371; // km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
+    }
 }

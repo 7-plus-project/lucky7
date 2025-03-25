@@ -26,11 +26,25 @@ public class Store extends Timestamped {
 
     private String address;
 
+    @Column(nullable = false)
+    private double latitude;
+
+    @Column(nullable = false)
+    private double longitude;
+
     @Enumerated(EnumType.STRING)
     private StoreCategory category;
 
     @Column
     private LocalDateTime deletedAt;
+
+    public Store(String name, String address, StoreCategory category, double latitude, double longitude) {
+        this.name = name;
+        this.address = address;
+        this.category = category;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     public Store(String name, String address, StoreCategory category) {
         this.name = name;
@@ -47,6 +61,4 @@ public class Store extends Timestamped {
         this.address = request.getAddress();
         this.category = request.getCategory();
     }
-
-
 }

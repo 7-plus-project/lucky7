@@ -30,14 +30,14 @@ public class StoreController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<StoreListResponse>> getStores(
+    public ResponseEntity<Page<StoreListResponse>> searchStores(
+            @RequestParam String address,
+            @RequestParam int distance,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) LocalDateTime startDate,
-            @RequestParam(required = false) LocalDateTime endDate
+            @RequestParam(defaultValue = "10") int size
             // todo 검색 키워드 추가하기
-    ){
-        return ResponseEntity.ok(storeService.findStores(page,size, startDate, endDate));
+    ) {
+        return ResponseEntity.ok(storeService.searchStoresByDistance(address, distance, page, size));
     }
 
     @GetMapping("/{storeId}")
@@ -59,6 +59,4 @@ public class StoreController {
         storeService.delete(storeId);
         return ResponseEntity.noContent().build();
     }
-
-
 }

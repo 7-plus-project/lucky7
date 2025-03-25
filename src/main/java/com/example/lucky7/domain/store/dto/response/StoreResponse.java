@@ -12,13 +12,17 @@ public class StoreResponse {
     private String name;
     private String address;
     private StoreCategory category;
+    private double latitude;
+    private double longitude;
 
     public static StoreResponse toDto(Store store) {
         return new StoreResponse(
                 store.getId(),
                 store.getName(),
                 store.getAddress(),
-                store.getCategory()
+                store.getCategory(),
+                store.getLatitude(),
+                store.getLongitude()
         );
 
     }
