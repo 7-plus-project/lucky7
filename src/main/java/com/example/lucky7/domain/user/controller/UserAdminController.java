@@ -17,7 +17,7 @@ public class UserAdminController {
 
     private final UserAdminService userAdminService;
 
-    @PatchMapping("/admin/users/{userId}")
+    @PatchMapping("/api/v1/admin/users/{userId}")
     public void changeUserRole(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable long userId,
