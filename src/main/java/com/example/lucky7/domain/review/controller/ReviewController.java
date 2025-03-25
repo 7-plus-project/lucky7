@@ -6,7 +6,6 @@ import com.example.lucky7.domain.review.dto.response.ReviewCreateResponse;
 import com.example.lucky7.domain.review.dto.response.ReviewResponse;
 import com.example.lucky7.domain.review.service.ReviewService;
 import jakarta.validation.Valid;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/v1/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -29,8 +28,8 @@ public class ReviewController {
     }
     // 리뷰 조회
     @GetMapping
-    public ResponseEntity<Page<ReviewResponse>> getReviews(@RequestParam(defaultValue = "1") int size,
-                                                           @RequestParam(defaultValue = "10") int page) {
+    public ResponseEntity<Page<ReviewResponse>> getReviews(@RequestParam(defaultValue = "10") int size,
+                                                           @RequestParam(defaultValue = "1") int page) {
         return ResponseEntity.ok(reviewService.findReviews(size, page));
     }
     // 리뷰 삭제

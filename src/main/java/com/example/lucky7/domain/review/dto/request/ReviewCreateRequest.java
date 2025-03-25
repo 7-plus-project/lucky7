@@ -12,4 +12,6 @@ public class ReviewCreateRequest {
     private String comments;
     @NotNull(message = "별점 값 입력은 필수입니다")
     private Long pointValue;
+    @NotNull(message = "식당 ID 값 압력은 필수입니다")
+    private Long storeId;
 }

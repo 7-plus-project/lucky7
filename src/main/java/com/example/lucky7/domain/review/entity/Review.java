@@ -3,10 +3,14 @@ package com.example.lucky7.domain.review.entity;
 import com.example.lucky7.domain.common.entity.Timestamped;
 import com.example.lucky7.domain.review.enums.ReviewState;
 import com.example.lucky7.domain.review.enums.StarPoint;
+import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -32,10 +36,15 @@ public class Review extends Timestamped {
     @Column(nullable = false)
     private ReviewState reviewState;
 
-    public Review(String comments, Long pointValue, User user) {
+    @JoinColumn(name = "store_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Store store;
+
+    public Review(String comments, Long pointValue, User user, Store store) {
         this.comments = comments;
         this.starPoint = StarPoint.of(pointValue);
         this.user = user;
+        this.store = store;
         this.reviewState = ReviewState.ACTIVE;
     }
 

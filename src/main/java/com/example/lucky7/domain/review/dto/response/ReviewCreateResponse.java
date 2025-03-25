@@ -14,13 +14,15 @@ public class ReviewCreateResponse {
     private String comments;
     private Long userId;
     private StarPoint starPoint;
+    private Long storeId;
 
     public static ReviewCreateResponse toDto(Review review) {
         return new ReviewCreateResponse(
                 review.getId(),
                 review.getComments(),
                 review.getUser().getId(),
-                review.getStarPoint()
+                review.getStarPoint(),
+                review.getStore().getId()
         );
     }
 }

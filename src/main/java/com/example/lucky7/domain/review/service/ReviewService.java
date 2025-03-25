@@ -7,6 +7,8 @@ import com.example.lucky7.domain.review.dto.response.ReviewResponse;
 import com.example.lucky7.domain.review.entity.Review;
 import com.example.lucky7.domain.review.enums.ReviewState;
 import com.example.lucky7.domain.review.repository.ReviewRepository;
+import com.example.lucky7.domain.store.entity.Store;
+import com.example.lucky7.domain.store.repository.StoreRepository;
 import com.example.lucky7.domain.user.entity.User;
 import com.example.lucky7.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,13 +26,16 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
 
     // 리뷰 생성
     @Transactional
     public ReviewCreateResponse createReview(AuthUser authUser, ReviewCreateRequest reviewCreateRequest) {
         User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(() -> new EntityNotFoundException("Entity Not Found"));
-        Review review = new Review(reviewCreateRequest.getComments(), reviewCreateRequest.getPointValue(), user);
+                .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
+        Store store = storeRepository.findById(reviewCreateRequest.getStoreId())
+                .orElseThrow(() -> new EntityNotFoundException("Store Not Found"));
+        Review review = new Review(reviewCreateRequest.getComments(), reviewCreateRequest.getPointValue(), user, store);
         Review savedReview = reviewRepository.save(review);
         return ReviewCreateResponse.toDto(savedReview);
     }

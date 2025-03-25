@@ -13,16 +13,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getUser(@PathVariable long userId) {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam String nickname
     ) {
