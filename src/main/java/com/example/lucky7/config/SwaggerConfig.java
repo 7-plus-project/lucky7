@@ -27,15 +27,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI api() {
         return new OpenAPI()
-                .components(new Components()
-//                        .addSecuritySchemes("Authorization",
-//                                new io.swagger.v3.oas.models.security.SecurityScheme()
-//                                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.APIKEY)
-//                                        .in(io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER)
-//                                        .name("Authorization")
-//                                        .description("Token을 입력해주세요.")
-//                        )
-                )
+                .components(new Components())
                 .info(apiInfo())
                 .security(Collections.singletonList(new SecurityRequirement().addList("Authorization")));
     }
