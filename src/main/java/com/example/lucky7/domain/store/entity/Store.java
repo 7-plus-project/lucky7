@@ -1,5 +1,6 @@
 package com.example.lucky7.domain.store.entity;
 
+import ch.hsr.geohash.GeoHash;
 import com.example.lucky7.domain.common.entity.Timestamped;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.enums.StoreCategory;
@@ -53,11 +54,39 @@ public class Store extends Timestamped {
         this.category = request.getCategory();
     }
 
+
+    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private String geoHash;
+
+
+    public Store(String name, String address, StoreCategory category, Double latitude, Double longitude) {
+        this.name = name;
+        this.address = address;
+        this.category = category;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.geoHash = generateGeoHash(latitude, longitude);
+    }
+
+
+    private String generateGeoHash(double lat, double lon) {
+        return GeoHash.withCharacterPrecision(lat, lon, 7).toBase32();
+    }
+
+    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
+
+
     /* MYSQL 위치 검색 - 컬럼 추가 */
     @Column(nullable = false)
     private double storeLon; // 경도
     @Column(nullable = false)
     private double storeLat; // 위도
+
 
     @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point location; // Point(경도, 위도)
