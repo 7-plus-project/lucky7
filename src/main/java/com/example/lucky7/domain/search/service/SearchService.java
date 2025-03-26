@@ -14,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class SearchService {
 
     private final SearchRepository searchRepository;
+
 
     private void increaseSearchCount(String name, String category) {
         if (name != null) {
@@ -28,11 +29,11 @@ public class SearchService {
             searchRepository.increaseKeywordCount(category);
         }
     }
-
+    @Transactional
     public Page<String> getTopKeywords(Pageable pageable) {
         return searchRepository.findTopKeyword(pageable);
     }
-
+    @Transactional
     public Page<SearchResponse> getStores(int page, int size, String name, StoreCategory category) {
         Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
         increaseSearchCount(name, category != null ? category.toString() : null);
@@ -46,6 +47,7 @@ public class SearchService {
         ));
     }
 
+    @Transactional
     @Scheduled(cron = "0 0 * * * *") // 정각마다 실행
     public void resetSearchCounts() {
         searchRepository.resetAllSearchCounts();

@@ -1,4 +1,4 @@
-package com.example.lucky7.domain.config;
+package com.example.lucky7.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

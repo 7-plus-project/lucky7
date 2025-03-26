@@ -3,6 +3,7 @@ package com.example.lucky7.domain.search.controller;
 import com.example.lucky7.domain.search.dto.response.SearchResponse;
 import com.example.lucky7.domain.search.service.SearchService;
 import com.example.lucky7.domain.store.enums.StoreCategory;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
