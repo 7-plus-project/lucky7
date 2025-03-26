@@ -4,7 +4,7 @@ import com.example.lucky7.domain.common.exception.InvalidRequestException;
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
-import com.example.lucky7.domain.store.dto.response.StoreLocationListResponse;
+import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.repository.StoreRepository;
@@ -86,7 +86,7 @@ public class StoreService {
     }
 
     /* MYSQL 위치 검색 - 메서드 추가 */
-    public StoreLocationListResponse findStoresLocation(double lon, double lat, double range) {
+    public StoreGisListResponse findNearByGis(double lon, double lat, double range) {
         // 경도, 위도의 계산을 위해 km를 m로 변환
         double meterRange = range * 1000;
         // 경도, 위도에서 0.01도는 1100m인 것을 사용해 몇 m는 위도, 경도로 어느 정도인지 계산
@@ -96,6 +96,6 @@ public class StoreService {
         userLocation.setSRID(4326); // SRID 4326 (WGS 84 좌표계)로 설정
 
         List<Store> storeList = storeRepository.findStoresByUserLocationOrderByDistance(userLocation, meterRange);
-        return StoreLocationListResponse.fromStoreList(storeList);
+        return StoreGisListResponse.fromStoreList(storeList);
     }
 }
