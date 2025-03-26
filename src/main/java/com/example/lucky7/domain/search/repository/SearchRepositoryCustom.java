@@ -6,5 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface SearchRepositoryCustom {
-    Page<Store> findStoresByQuerydsl(String name, StoreCategory category, Pageable pageable);
+    Page<Store> findStores(String name, StoreCategory category, Pageable pageable);
+    Page<String> findTopKeyword(Pageable pageable);
+    void increaseKeywordCount(String keyword);
+    void resetAllSearchCounts();
+
 }
