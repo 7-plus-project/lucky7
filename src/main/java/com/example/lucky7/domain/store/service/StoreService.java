@@ -22,7 +22,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class StoreService {
 
     private final StoreRepository storeRepository;
@@ -41,10 +40,10 @@ public class StoreService {
         );
 
         Store savedStore = storeRepository.save(store);
-
-        return StoreResponse.toDto(savedStore);
-
+        return new StoreResponse(savedStore);
     }
+
+    @Transactional(readOnly = true)
     public Page<StoreListResponse> searchStoresByDistance(String address, int distanceKm, int page, int size) {
         Coordinate userLocation = kakaoMapClient.geocode(address);
 
@@ -55,7 +54,7 @@ public class StoreService {
                         userLocation.latitude(), userLocation.longitude(),
                         store.getLatitude(), store.getLongitude()
                 ) <= distanceKm)
-                .map(StoreListResponse::from)
+                .map(StoreListResponse::new)
                 .toList();
 
         int fromIndex = Math.min((page - 1) * size, filtered.size());
@@ -65,24 +64,22 @@ public class StoreService {
         return new PageImpl<>(pageContent, PageRequest.of(page - 1, size), filtered.size());
     }
 
+    @Transactional(readOnly = true)
     public StoreResponse findStore(Long storeId) {
-
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
 
-        return StoreResponse.toDto(store);
-
+        return new StoreResponse(store);
     }
 
     @Transactional
     public StoreResponse update(Long storeId, StoreUpdateRequest request) {
-
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
 
         store.updateStore(request);
 
-        return StoreResponse.toDto(store);
+        return new StoreResponse(store);
 
     }
 
@@ -96,12 +93,14 @@ public class StoreService {
 
     private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
         final int EARTH_RADIUS = 6371; // km
+
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                 Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
                         Math.sin(dLng / 2) * Math.sin(dLng / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
         return EARTH_RADIUS * c;
     }
 }

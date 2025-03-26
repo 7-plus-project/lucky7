@@ -8,17 +8,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class StoreListResponse {
-    private Long id;
-    private String name;
-    private String address;
-    private StoreCategory category;
 
-    public static StoreListResponse from(Store store) {
-        return new StoreListResponse(
-                store.getId(),
-                store.getName(),
-                store.getAddress(),
-                store.getCategory()
-        );
+    private final Long id;
+    private final String name;
+    private final String address;
+    private final StoreCategory category;
+
+    public StoreListResponse(Store store) {
+        this.id = store.getId();
+        this.name = store.getName();
+        this.address = store.getAddress();
+        this.category = store.getCategory();
     }
 }

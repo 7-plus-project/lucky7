@@ -15,15 +15,12 @@ public class StoreResponse {
     private double latitude;
     private double longitude;
 
-    public static StoreResponse toDto(Store store) {
-        return new StoreResponse(
-                store.getId(),
-                store.getName(),
-                store.getAddress(),
-                store.getCategory(),
-                store.getLatitude(),
-                store.getLongitude()
-        );
-
+    public StoreResponse(Store store) {
+        this.id = store.getId();
+        this.name = store.getName();
+        this.address = store.getAddress();
+        this.category = store.getCategory();
+        this.latitude = store.getLatitude();
+        this.longitude = store.getLongitude();
     }
 }
