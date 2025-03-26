@@ -17,9 +17,4 @@ public class StoreCreateRequest {
 
     private StoreCategory category;
 
-    /* MYSQL 위치 검색 - 팰드 추가 */
-    private double storeLon; // 경도
-
-    private double storeLat; // 위도
-
 }
