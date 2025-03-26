@@ -19,6 +19,20 @@ public class SearchService {
 
     private final SearchRepository searchRepository;
 
+    @Transactional(readOnly = false)
+    public Page<SearchResponse> getStores(int page, int size, String name, StoreCategory category) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
+        increaseSearchCount(name, category != null ? category.toString() : null);
+
+        Page<Store> stores = searchRepository.findStores(name, category, pageable);
+
+        return stores.map(store -> new SearchResponse(
+                store.getId(),
+                store.getName(),
+                store.getCategory()
+        ));
+    }
+
     @Transactional
     public void increaseSearchCount(String name, String category) {
         if (name != null) {
@@ -32,19 +46,6 @@ public class SearchService {
 
     public Page<String> getTopKeywords(Pageable pageable) {
         return searchRepository.findTopKeyword(pageable);
-    }
-
-    public Page<SearchResponse> getStores(int page, int size, String name, StoreCategory category) {
-        Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
-        increaseSearchCount(name, category != null ? category.toString() : null);
-
-        Page<Store> stores = searchRepository.findStores(name, category, pageable);
-
-        return stores.map(store -> new SearchResponse(
-                store.getId(),
-                store.getName(),
-                store.getCategory()
-        ));
     }
 
     @Transactional
