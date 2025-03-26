@@ -44,7 +44,7 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StoreListResponse> searchStoresByDistance(String address, int distanceKm, int page, int size) {
+    public Page<StoreListResponse> searchStoresByDistanceB(String address, int distanceKm, int page, int size) {
         Coordinate userLocation = kakaoMapClient.geocode(address);
 
         List<Store> allStores = storeRepository.findAll();

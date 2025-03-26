@@ -37,7 +37,7 @@ public class StoreController {
             @RequestParam(defaultValue = "10") int size
             // todo 검색 키워드 추가하기
     ) {
-        return ResponseEntity.ok(storeService.searchStoresByDistance(address, distance, page, size));
+        return ResponseEntity.ok(storeService.searchStoresByDistanceB(address, distance, page, size));
     }
 
     @GetMapping("/{storeId}")
