@@ -14,10 +14,12 @@ public class StoreListResponse {
     private final String address;
     private final StoreCategory category;
 
+    /* 범서
     public StoreListResponse(Store store) {
         this.id = store.getId();
         this.name = store.getName();
         this.address = store.getAddress();
         this.category = store.getCategory();
     }
+    */
 }

@@ -59,4 +59,17 @@ public class StoreController {
         storeService.delete(storeId);
         return ResponseEntity.noContent().build();
     }
+
+    /* 범서
+    @GetMapping
+    public ResponseEntity<Page<StoreListResponse>> searchStores(
+            @RequestParam String address,
+            @RequestParam int distance,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+            // todo 검색 키워드 추가하기
+    ) {
+        return ResponseEntity.ok(storeService.searchStoresByDistanceB(address, distance, page, size));
+    }
+     */
 }

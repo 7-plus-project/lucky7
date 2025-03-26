@@ -46,12 +46,6 @@ public class Store extends Timestamped {
         this.longitude = longitude;
     }
 
-    public Store(String name, String address, StoreCategory category) {
-        this.name = name;
-        this.address = address;
-        this.category = category;
-    }
-
     public void deleteStore(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
@@ -61,4 +55,12 @@ public class Store extends Timestamped {
         this.address = request.getAddress();
         this.category = request.getCategory();
     }
+
+    /* 범서
+    public Store(String name, String address, StoreCategory category) {
+        this.name = name;
+        this.address = address;
+        this.category = category;
+    }
+    */
 }

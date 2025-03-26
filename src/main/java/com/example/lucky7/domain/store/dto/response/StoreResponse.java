@@ -15,6 +15,7 @@ public class StoreResponse {
     private double latitude;
     private double longitude;
 
+    /* 범서
     public StoreResponse(Store store) {
         this.id = store.getId();
         this.name = store.getName();
@@ -22,5 +23,5 @@ public class StoreResponse {
         this.category = store.getCategory();
         this.latitude = store.getLatitude();
         this.longitude = store.getLongitude();
-    }
+    } */
 }

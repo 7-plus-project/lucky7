@@ -25,8 +25,37 @@ import java.util.List;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final KakaoMapClient kakaoMapClient;
+    // 범서
+    // private final KakaoMapClient kakaoMapClient;
 
+    @Transactional(readOnly = true)
+    public StoreResponse findStore(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
+
+        return new StoreResponse(store);
+    }
+
+    @Transactional
+    public StoreResponse update(Long storeId, StoreUpdateRequest request) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
+
+        store.updateStore(request);
+
+        return new StoreResponse(store);
+
+    }
+
+    @Transactional
+    public void delete(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
+
+        store.deleteStore(LocalDateTime.now());
+    }
+
+    /* 범서
     @Transactional
     public StoreResponse save(StoreCreateRequest request) {
         Coordinate coord = kakaoMapClient.geocode(request.getAddress());
@@ -64,33 +93,6 @@ public class StoreService {
         return new PageImpl<>(pageContent, PageRequest.of(page - 1, size), filtered.size());
     }
 
-    @Transactional(readOnly = true)
-    public StoreResponse findStore(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
-
-        return new StoreResponse(store);
-    }
-
-    @Transactional
-    public StoreResponse update(Long storeId, StoreUpdateRequest request) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
-
-        store.updateStore(request);
-
-        return new StoreResponse(store);
-
-    }
-
-    @Transactional
-    public void delete(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new InvalidRequestException("해당 id의 가게가 존재하지 않습니다."));
-
-        store.deleteStore(LocalDateTime.now());
-    }
-
     private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
         final int EARTH_RADIUS = 6371; // km
 
@@ -103,4 +105,5 @@ public class StoreService {
 
         return EARTH_RADIUS * c;
     }
+    */
 }
