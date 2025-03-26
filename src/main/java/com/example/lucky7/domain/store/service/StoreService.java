@@ -7,22 +7,36 @@ import com.example.lucky7.domain.store.dto.response.StoreListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.repository.StoreRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.*;
+import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.core.GeoOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public StoreResponse save(StoreCreateRequest request) {
@@ -78,5 +92,114 @@ public class StoreService {
 
         store.deleteStore(LocalDateTime.now());
     }
+
+    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+
+    /* GeoHash 사용한 가게 생성 (저장) */
+    @Transactional
+    public StoreResponse saveWithGeoHash(StoreCreateRequest request){
+
+        Store store = new Store(
+                request.getName(),
+                request.getAddress(),
+                request.getCategory(),
+                request.getLatitude(),
+                request.getLongitude()
+        );
+
+        Store savedStore = storeRepository.save(store);
+        log.info("저장된 가게 아이디 : "+savedStore.getId().toString());
+
+        GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+
+        String redisKey = "storeLocations"; // Geo 데이터 저장 키
+        String storeKey = "store:" + savedStore.getId(); // 개별 가게 정보 저장 키
+
+        // 가게의 위치 정보 저장 (Geo)
+        geoOps.add(redisKey, new Point(savedStore.getLongitude(), savedStore.getLatitude()), String.valueOf(savedStore.getId()));
+
+        // json 형태로 가게 정보 저장
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
+
+        try {
+
+            Map<String, Object> storeMap = new HashMap<>();
+            storeMap.put("id", String.valueOf(savedStore.getId()));
+            storeMap.put("name", savedStore.getName());
+            storeMap.put("address", savedStore.getAddress());
+            storeMap.put("category", savedStore.getCategory());
+            storeMap.put("latitude", savedStore.getLatitude());
+            storeMap.put("longitude", savedStore.getLongitude());
+
+            String storeJson = objectMapper.writeValueAsString(storeMap);
+
+            valueOps.set(storeKey, storeJson);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return StoreResponse.toDto(savedStore);
+    }
+
+
+    /* GeoHash 사용한 위치 기반 가게 검색 */
+    public List<StoreResponse> findNearbyGeoHash(double longitude, double latitude, double distance) {
+        GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+
+        String key = "storeLocations";
+
+        Point point = new Point(longitude, latitude); // 사용자의 현재 위치
+        GeoReference reference = GeoReference.fromCoordinate(point); // 좌표 기반 검색 기준 설정
+
+
+        RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs
+                .newGeoRadiusArgs()
+                .includeDistance()
+                .includeCoordinates()
+                .sortAscending()
+                .limit(10);
+
+        Distance radius = new Distance(distance, RedisGeoCommands.DistanceUnit.KILOMETERS); // distance(km) 범위 설정
+
+        GeoResults<RedisGeoCommands.GeoLocation<String>> results = geoOps.search(key, reference, radius, args);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        if (results == null) return Collections.emptyList();
+
+        List<StoreResponse> storeResponses = new ArrayList<>();
+
+        for (GeoResult<RedisGeoCommands.GeoLocation<String>> result : results){
+            String storeId = result.getContent().getName();
+
+            String storeKey = "store:" + storeId;
+            String storeJson = valueOps.get(storeKey);
+
+            if (storeJson != null) {
+                try {
+                    // JSON을 Store 객체로 변환
+                    Store store = objectMapper.readValue(storeJson, Store.class);
+
+                    // StoreResponse DTO로 변환하여 저장
+                    StoreResponse storeResponse = StoreResponse.toDto(store);
+                    storeResponses.add(storeResponse);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        return storeResponses;
+    }
+
+    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
 
 }

@@ -1,5 +1,6 @@
 package com.example.lucky7.domain.store.entity;
 
+import ch.hsr.geohash.GeoHash;
 import com.example.lucky7.domain.common.entity.Timestamped;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.enums.StoreCategory;
@@ -47,6 +48,31 @@ public class Store extends Timestamped {
         this.address = request.getAddress();
         this.category = request.getCategory();
     }
+
+    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private String geoHash;
+
+
+    public Store(String name, String address, StoreCategory category, Double latitude, Double longitude) {
+        this.name = name;
+        this.address = address;
+        this.category = category;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.geoHash = generateGeoHash(latitude, longitude);
+    }
+
+
+    private String generateGeoHash(double lat, double lon) {
+        return GeoHash.withCharacterPrecision(lat, lon, 7).toBase32();
+    }
+
+    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
 
 
 }

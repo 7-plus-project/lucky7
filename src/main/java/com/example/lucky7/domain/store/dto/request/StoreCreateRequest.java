@@ -16,4 +16,8 @@ public class StoreCreateRequest {
 
     private StoreCategory category;
 
+
+    private Double latitude;
+    private Double longitude;
+
 }
