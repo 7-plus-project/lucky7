@@ -64,6 +64,9 @@ dependencies {
 
 	// WebClient 사용을 위한 WebFlux
      implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
+
 }
 
 tasks.named('test') {
