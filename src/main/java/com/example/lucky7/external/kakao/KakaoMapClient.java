@@ -1,5 +1,6 @@
 package com.example.lucky7.external.kakao;
 
+import com.example.lucky7.external.kakao.Coordinate;
 import org.springframework.web.reactive.function.client.WebClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

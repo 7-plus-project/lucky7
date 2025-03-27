@@ -1,6 +1,8 @@
 package com.example.lucky7.domain.store.dto.response;
 
 
+import com.example.lucky7.domain.store.entity.Store;
+import com.example.lucky7.domain.store.enums.StoreCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

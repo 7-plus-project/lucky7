@@ -2,10 +2,13 @@ package com.example.lucky7.domain.store.controller;
 
 import com.example.lucky7.domain.common.dto.AuthUser;
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
+import com.example.lucky7.domain.store.dto.request.StoreCreateRequestKakao;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
-import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
+//import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
+import com.example.lucky7.domain.store.dto.response.StoreListResponseKakao;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
+import com.example.lucky7.domain.store.dto.response.StoreResponseKakao;
 import com.example.lucky7.domain.store.service.StoreService;
 import com.example.lucky7.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -44,17 +47,6 @@ public class StoreController {
         return ResponseEntity.ok(storeService.findStores(page,size, startDate, endDate));
     }
 
-    /* MYSQL 위치 검색 - 메서드 추가 */
-    @GetMapping("/gis")
-    public ResponseEntity<StoreGisListResponse> getNearByGis(
-             @RequestParam(value = "lon") double lon,
-             @RequestParam(value = "lat") double lat,
-             @RequestParam(value = "range") double range) {
-        StoreGisListResponse storeList = storeService.findNearByGis(lon, lat, range);
-        if (storeList.isEmpty())
-            return ResponseEntity.noContent().build();
-        return ResponseEntity.ok().body(storeList);
-    }
 
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreResponse> getStore(@PathVariable Long storeId) {
@@ -76,21 +68,35 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 
-    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+//    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+//
+//    @PostMapping("/geohash")
+//    public ResponseEntity<StoreResponse> saveWithGeoHash(@RequestBody StoreCreateRequest request) {
+//        return ResponseEntity.ok(storeService.saveWithGeoHash(request));
+//    }
+//
+//    @GetMapping("/geohash")
+//    public ResponseEntity<List<StoreResponse>> getNearByGeoHash(
+//            @RequestParam(value = "longitude") double longitude,
+//            @RequestParam(value = "latitude") double latitude,
+//            @RequestParam(value = "distance") double distance) {
+//        List<StoreResponse> nearbyStores = storeService.findNearbyGeoHash(longitude, latitude, distance);
+//        return ResponseEntity.ok(nearbyStores);
+//    }
+//
+//    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
 
-    @PostMapping("/geohash")
-    public ResponseEntity<StoreResponse> saveWithGeoHash(@RequestBody StoreCreateRequest request) {
-        return ResponseEntity.ok(storeService.saveWithGeoHash(request));
-    }
-
-    @GetMapping("/geohash")
-    public ResponseEntity<List<StoreResponse>> getNearByGeoHash(
-            @RequestParam(value = "longitude") double longitude,
-            @RequestParam(value = "latitude") double latitude,
-            @RequestParam(value = "distance") double distance) {
-        List<StoreResponse> nearbyStores = storeService.findNearbyGeoHash(longitude, latitude, distance);
-        return ResponseEntity.ok(nearbyStores);
-    }
+//    /* MYSQL 위치 검색 - 메서드 추가 */
+//    @GetMapping("/gis")
+//    public ResponseEntity<StoreGisListResponse> getNearByGis(
+//            @RequestParam(value = "lon") double lon,
+//            @RequestParam(value = "lat") double lat,
+//            @RequestParam(value = "range") double range) {
+//        StoreGisListResponse storeList = storeService.findNearByGis(lon, lat, range);
+//        if (storeList.isEmpty())
+//            return ResponseEntity.noContent().build();
+//        return ResponseEntity.ok().body(storeList);
+//    }
 
     // ------------------- Kakao API 사용 ----------------------------
     @PostMapping("/kakao")
