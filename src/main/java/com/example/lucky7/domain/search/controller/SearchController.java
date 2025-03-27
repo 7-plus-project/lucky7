@@ -5,6 +5,7 @@ import com.example.lucky7.domain.search.service.SearchService;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,5 +27,14 @@ public class SearchController {
             @RequestParam(required = false) StoreCategory category
     ){
         return ResponseEntity.ok(searchService.getStores(page,size,name,category));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<Page<String>> getPopularKeyword(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
+        return ResponseEntity.ok(searchService.getTopKeywords(pageable));
     }
 }
