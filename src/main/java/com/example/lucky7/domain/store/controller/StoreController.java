@@ -92,6 +92,19 @@ public class StoreController {
         return ResponseEntity.ok(nearbyStores);
     }
 
-    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
+    // ------------------- Kakao API 사용 ----------------------------
+    @PostMapping("/kakao")
+    public ResponseEntity<StoreResponseKakao> saveStoreWithKakao(@RequestBody StoreCreateRequestKakao request) {
+        return ResponseEntity.ok(storeService.saveKakao(request));
+    }
 
+    @GetMapping("/kakao")
+    public ResponseEntity<Page<StoreListResponseKakao>> searchStoresKakao(
+            @RequestParam String address,
+            @RequestParam int distance,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(storeService.searchStoresByDistanceKaKao(address, distance, page, size));
+    }
 }

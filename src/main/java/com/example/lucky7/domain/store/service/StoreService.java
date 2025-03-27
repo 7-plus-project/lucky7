@@ -44,11 +44,8 @@ import java.util.*;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-
     private final RedisTemplate<String, String> redisTemplate;
-
     private static final GeometryFactory geometryFactory = new GeometryFactory();
-
 
     @Transactional
     public StoreResponse save(StoreCreateRequest request) {
@@ -229,5 +226,57 @@ public class StoreService {
         List<Store> storeList = storeRepository.findStoresByUserLocationOrderByDistance(userLocation, meterRange);
         return StoreGisListResponse.fromStoreList(storeList);
     }
+    
+    // ------------------- kakao API ----------------------------
+    private final KakaoMapClient kakaoMapClient;
+    
+    @Transactional
+    public StoreResponseKakao saveKakao(StoreCreateRequestKakao request) {
+        Coordinate coord = kakaoMapClient.geocode(request.getAddress());
 
+        Store store = Store.fromKakao(
+                request.getName(),
+                request.getAddress(),
+                request.getCategory(),
+                coord.latitude(),
+                coord.longitude()
+            );
+
+        Store savedStore = storeRepository.save(store);
+        return StoreResponseKakao.toDto(savedStore);
+    }
+
+    
+    public Page<StoreListResponseKakao> searchStoresByDistanceKaKao(String address, int distanceKm, int page, int size) {
+        Coordinate userLocation = kakaoMapClient.geocode(address);
+        List<Store> allStores = storeRepository.findAll();
+
+        List<StoreListResponseKakao> filtered = allStores.stream()
+                .filter(store -> calculateDistance(
+                        userLocation.latitude(), userLocation.longitude(),
+                        store.getLatitudeKakao(), store.getLongitudeKakao()
+                ) <= distanceKm)
+                .map(StoreListResponseKakao::from)
+                .toList();
+
+        
+        int fromIndex = Math.min((page - 1) * size, filtered.size());
+        int toIndex = Math.min(fromIndex + size, filtered.size());
+        List<StoreListResponseKakao> pageContent = filtered.subList(fromIndex, toIndex);
+
+        return new PageImpl<>(pageContent, PageRequest.of(page - 1, size), filtered.size());
+    }
+        
+    
+    // 사용 거리 계산
+    private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
+        final int EARTH_RADIUS = 6371; // km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
+    }
 }
