@@ -4,7 +4,7 @@ import com.example.lucky7.domain.common.exception.InvalidRequestException;
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
-import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
+//import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.repository.StoreRepository;
@@ -106,128 +106,128 @@ public class StoreService {
     }
 
 
-    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+//    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
+//
+//    /* GeoHash 사용한 가게 생성 (저장) */
+//    @Transactional
+//    public StoreResponse saveWithGeoHash(StoreCreateRequest request){
+//
+//        Store store = new Store(
+//                request.getName(),
+//                request.getAddress(),
+//                request.getCategory(),
+//                request.getLatitude(),
+//                request.getLongitude()
+//        );
+//
+//        Store savedStore = storeRepository.save(store);
+//        log.info("저장된 가게 아이디 : "+savedStore.getId().toString());
+//
+//        GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
+//        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+//
+//        String redisKey = "storeLocations"; // Geo 데이터 저장 키
+//        String storeKey = "store:" + savedStore.getId(); // 개별 가게 정보 저장 키
+//
+//        // 가게의 위치 정보 저장 (Geo)
+//        geoOps.add(redisKey, new Point(savedStore.getLongitude(), savedStore.getLatitude()), String.valueOf(savedStore.getId()));
+//
+//        // json 형태로 가게 정보 저장
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.registerModule(new JavaTimeModule());
+//        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+//
+//
+//        try {
+//
+//            Map<String, Object> storeMap = new HashMap<>();
+//            storeMap.put("id", String.valueOf(savedStore.getId()));
+//            storeMap.put("name", savedStore.getName());
+//            storeMap.put("address", savedStore.getAddress());
+//            storeMap.put("category", savedStore.getCategory());
+//            storeMap.put("latitude", savedStore.getLatitude());
+//            storeMap.put("longitude", savedStore.getLongitude());
+//
+//            String storeJson = objectMapper.writeValueAsString(storeMap);
+//
+//            valueOps.set(storeKey, storeJson);
+//
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return StoreResponse.toDto(savedStore);
+//    }
+//
+//
+//    /* GeoHash 사용한 위치 기반 가게 검색 */
+//    public List<StoreResponse> findNearbyGeoHash(double longitude, double latitude, double distance) {
+//        GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
+//        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+//
+//        String key = "storeLocations";
+//
+//        Point point = new Point(longitude, latitude); // 사용자의 현재 위치
+//        GeoReference reference = GeoReference.fromCoordinate(point); // 좌표 기반 검색 기준 설정
+//
+//
+//        RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs
+//                .newGeoRadiusArgs()
+//                .includeDistance()
+//                .includeCoordinates()
+//                .sortAscending()
+//                .limit(10);
+//
+//        Distance radius = new Distance(distance, RedisGeoCommands.DistanceUnit.KILOMETERS); // distance(km) 범위 설정
+//
+//        GeoResults<RedisGeoCommands.GeoLocation<String>> results = geoOps.search(key, reference, radius, args);
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//
+//        if (results == null) return Collections.emptyList();
+//
+//        List<StoreResponse> storeResponses = new ArrayList<>();
+//
+//        for (GeoResult<RedisGeoCommands.GeoLocation<String>> result : results){
+//            String storeId = result.getContent().getName();
+//
+//            String storeKey = "store:" + storeId;
+//            String storeJson = valueOps.get(storeKey);
+//
+//            if (storeJson != null) {
+//                try {
+//                    // JSON을 Store 객체로 변환
+//                    Store store = objectMapper.readValue(storeJson, Store.class);
+//
+//                    // StoreResponse DTO로 변환하여 저장
+//                    StoreResponse storeResponse = StoreResponse.toDto(store);
+//                    storeResponses.add(storeResponse);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//        }
+//
+//        return storeResponses;
+//    }
+//
+//    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
 
-    /* GeoHash 사용한 가게 생성 (저장) */
-    @Transactional
-    public StoreResponse saveWithGeoHash(StoreCreateRequest request){
 
-        Store store = new Store(
-                request.getName(),
-                request.getAddress(),
-                request.getCategory(),
-                request.getLatitude(),
-                request.getLongitude()
-        );
-
-        Store savedStore = storeRepository.save(store);
-        log.info("저장된 가게 아이디 : "+savedStore.getId().toString());
-
-        GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
-        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
-
-        String redisKey = "storeLocations"; // Geo 데이터 저장 키
-        String storeKey = "store:" + savedStore.getId(); // 개별 가게 정보 저장 키
-
-        // 가게의 위치 정보 저장 (Geo)
-        geoOps.add(redisKey, new Point(savedStore.getLongitude(), savedStore.getLatitude()), String.valueOf(savedStore.getId()));
-
-        // json 형태로 가게 정보 저장
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-
-
-        try {
-
-            Map<String, Object> storeMap = new HashMap<>();
-            storeMap.put("id", String.valueOf(savedStore.getId()));
-            storeMap.put("name", savedStore.getName());
-            storeMap.put("address", savedStore.getAddress());
-            storeMap.put("category", savedStore.getCategory());
-            storeMap.put("latitude", savedStore.getLatitude());
-            storeMap.put("longitude", savedStore.getLongitude());
-
-            String storeJson = objectMapper.writeValueAsString(storeMap);
-
-            valueOps.set(storeKey, storeJson);
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return StoreResponse.toDto(savedStore);
-    }
-
-
-    /* GeoHash 사용한 위치 기반 가게 검색 */
-    public List<StoreResponse> findNearbyGeoHash(double longitude, double latitude, double distance) {
-        GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
-        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
-
-        String key = "storeLocations";
-
-        Point point = new Point(longitude, latitude); // 사용자의 현재 위치
-        GeoReference reference = GeoReference.fromCoordinate(point); // 좌표 기반 검색 기준 설정
-
-
-        RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs
-                .newGeoRadiusArgs()
-                .includeDistance()
-                .includeCoordinates()
-                .sortAscending()
-                .limit(10);
-
-        Distance radius = new Distance(distance, RedisGeoCommands.DistanceUnit.KILOMETERS); // distance(km) 범위 설정
-
-        GeoResults<RedisGeoCommands.GeoLocation<String>> results = geoOps.search(key, reference, radius, args);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        if (results == null) return Collections.emptyList();
-
-        List<StoreResponse> storeResponses = new ArrayList<>();
-
-        for (GeoResult<RedisGeoCommands.GeoLocation<String>> result : results){
-            String storeId = result.getContent().getName();
-
-            String storeKey = "store:" + storeId;
-            String storeJson = valueOps.get(storeKey);
-
-            if (storeJson != null) {
-                try {
-                    // JSON을 Store 객체로 변환
-                    Store store = objectMapper.readValue(storeJson, Store.class);
-
-                    // StoreResponse DTO로 변환하여 저장
-                    StoreResponse storeResponse = StoreResponse.toDto(store);
-                    storeResponses.add(storeResponse);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        return storeResponses;
-    }
-
-    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
-
-
-    /* MYSQL 위치 검색 - 메서드 추가 */
-    public StoreGisListResponse findNearByGis(double lon, double lat, double range) {
-        // 경도, 위도의 계산을 위해 km를 m로 변환
-        double meterRange = range * 1000;
-        // 경도, 위도에서 0.01도는 1100m인 것을 사용해 몇 m는 위도, 경도로 어느 정도인지 계산
-        double meterToDegree = meterRange * 0.01 / 1100; // 0.01 : 1100 = meterToDegree : meterRange(몇 m)
-        // 사용자의 경도, 위도를 Point 데이터 타입으로 변경
-        Point userLocation = geometryFactory.createPoint(new Coordinate(lon, lat));
-        userLocation.setSRID(4326); // SRID 4326 (WGS 84 좌표계)로 설정
-
-        List<Store> storeList = storeRepository.findStoresByUserLocationOrderByDistance(userLocation, meterRange);
-        return StoreGisListResponse.fromStoreList(storeList);
-    }
+//    /* MYSQL 위치 검색 - 메서드 추가 */
+//    public StoreGisListResponse findNearByGis(double lon, double lat, double range) {
+//        // 경도, 위도의 계산을 위해 km를 m로 변환
+//        double meterRange = range * 1000;
+//        // 경도, 위도에서 0.01도는 1100m인 것을 사용해 몇 m는 위도, 경도로 어느 정도인지 계산
+//        double meterToDegree = meterRange * 0.01 / 1100; // 0.01 : 1100 = meterToDegree : meterRange(몇 m)
+//        // 사용자의 경도, 위도를 Point 데이터 타입으로 변경
+//        Point userLocation = geometryFactory.createPoint(new Coordinate(lon, lat));
+//        userLocation.setSRID(4326); // SRID 4326 (WGS 84 좌표계)로 설정
+//
+//        List<Store> storeList = storeRepository.findStoresByUserLocationOrderByDistance(userLocation, meterRange);
+//        return StoreGisListResponse.fromStoreList(storeList);
+//    }
 
 }

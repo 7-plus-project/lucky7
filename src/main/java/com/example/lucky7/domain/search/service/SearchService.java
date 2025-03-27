@@ -18,14 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class SearchService {
 
     private final SearchRepository searchRepository;
+    private final SearchCountService searchCountService;
 
     @Transactional(readOnly = false)
     public Page<SearchResponse> getStores(int page, int size, String name, StoreCategory category) {
         Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
-        increaseSearchCount(name, category != null ? category.toString() : null);
-
+        searchCountService.increaseSearchCount(name, category != null ? category.toString() : null);
         Page<Store> stores = searchRepository.findStores(name, category, pageable);
-
         return stores.map(store -> new SearchResponse(
                 store.getId(),
                 store.getName(),
@@ -33,16 +32,7 @@ public class SearchService {
         ));
     }
 
-    @Transactional
-    public void increaseSearchCount(String name, String category) {
-        if (name != null) {
-            searchRepository.increaseKeywordCount(name);
-        }
 
-        if (category != null) {
-            searchRepository.increaseKeywordCount(category);
-        }
-    }
 
     public Page<String> getTopKeywords(Pageable pageable) {
         return searchRepository.findTopKeyword(pageable);
