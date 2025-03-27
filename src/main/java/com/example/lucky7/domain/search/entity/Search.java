@@ -17,9 +17,17 @@ public class Search{
 
     private Long count;
 
-    public Search(String keyword, Long count) {
+    private Double score; // sorted set - score
+
+    public Search(String keyword, Long count, Double score) {
         this.keyword = keyword;
         this.count = count;
+        this.score = score;
+    }
+
+    // score 수정 메서드
+    public void updateScore(Double newScore) {
+        this.score = newScore;
     }
 
 }

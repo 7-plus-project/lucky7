@@ -59,7 +59,9 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.apache.commons:commons-pool2'
+    implementation 'io.lettuce:lettuce-core:6.3.1.RELEASE'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'  // Redis
     implementation 'ch.hsr:geohash:1.4.0'  // GeoHash 변환을 위한 라이브러리
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
@@ -75,6 +77,8 @@ sourceSets {
 }
 tasks.withType(JavaCompile).configureEach {
     options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+	// WebClient 사용을 위한 WebFlux
+     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

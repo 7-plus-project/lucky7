@@ -1,23 +1,25 @@
-package com.example.lucky7.domain.search.dto.response;
+package com.example.lucky7.domain.store.dto.response;
+
 
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class SearchResponse {
+public class StoreListResponseKakao {
+
     private Long id;
     private String name;
+    private String address;
     private StoreCategory category;
-
-    public static SearchResponse toDto(Store store){
-        return new SearchResponse(
+    
+    public static StoreListResponseKakao from(Store store) {
+        return new StoreListResponseKakao(
                 store.getId(),
                 store.getName(),
+                store.getAddress(),
                 store.getCategory()
         );
     }

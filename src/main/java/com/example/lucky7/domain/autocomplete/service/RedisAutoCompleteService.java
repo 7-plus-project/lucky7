@@ -23,14 +23,11 @@ public class RedisAutoCompleteService {
     }
 
     // 특정 prefix로 시작하는 자동완성 검색어 조회
-    public AutoCompleteResponse getAutoCompleteSuggestions(String prefix, int limit) {
-        Cursor<TypedTuple<String>> cursor = redisTemplate.opsForZSet()
-                // scan -> 성능 저하
-                .scan(AUTO_COMPLETE_KEY, ScanOptions.scanOptions().match(prefix + "*").count(limit * 2).build());
-        HashSet<String> results = new HashSet<>();
-        while (cursor.hasNext() && results.size() < limit) {
-            results.add(cursor.next().getValue());
-        }
-        return new AutoCompleteResponse(results);
-    }
+//    public AutoCompleteResponse getAutoCompleteSuggestions(String prefix, int limit) {
+//
+//        redisTemplate.
+//        HashSet<String> results = new HashSet<>();
+//
+//        return new AutoCompleteResponse(results);
+//    }
 }
