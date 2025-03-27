@@ -63,7 +63,8 @@ dependencies {
     // Hibernate Spatial
     implementation 'org.hibernate.orm:hibernate-spatial:6.2.9.Final'
 
-
+	// WebClient 사용을 위한 WebFlux
+     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {
