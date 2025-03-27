@@ -18,10 +18,10 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "ORDER BY s.modifiedAt DESC")
     Page<Store> findAllByOrderByModifiedAtDesc(Pageable pageable, LocalDateTime startDate, LocalDateTime endDate);
 
-    /* MYSQL 위치 검색 - 메서드 추가 */
-    // 사용자 위치 기반 맛집 조회 목록 - 거리순으로 정렬
-    @Query("SELECT s FROM Store s " +
-            "WHERE ST_Contains(ST_Buffer(:userLocation, :meterRange), s.location) " + // ST_Buffer와 ST_Contains로 spatial index 활용
-            "ORDER BY ST_Distance(s.location, :userLocation) ASC") // 거리가 가까운 가게부터 정렬
-    List<Store> findStoresByUserLocationOrderByDistance(@Param("userLocation") Point userLocation, @Param("meterRange") double meterRange);
+//    /* MYSQL 위치 검색 - 메서드 추가 */
+//    // 사용자 위치 기반 맛집 조회 목록 - 거리순으로 정렬
+//    @Query("SELECT s FROM Store s " +
+//            "WHERE ST_Contains(ST_Buffer(:userLocation, :meterRange), s.location) " + // ST_Buffer와 ST_Contains로 spatial index 활용
+//            "ORDER BY ST_Distance(s.location, :userLocation) ASC") // 거리가 가까운 가게부터 정렬
+//    List<Store> findStoresByUserLocationOrderByDistance(@Param("userLocation") Point userLocation, @Param("meterRange") double meterRange);
 }
