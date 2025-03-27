@@ -2,10 +2,13 @@ package com.example.lucky7.domain.store.controller;
 
 import com.example.lucky7.domain.common.dto.AuthUser;
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
+import com.example.lucky7.domain.store.dto.request.StoreCreateRequestKakao;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
 //import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
+import com.example.lucky7.domain.store.dto.response.StoreListResponseKakao;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
+import com.example.lucky7.domain.store.dto.response.StoreResponseKakao;
 import com.example.lucky7.domain.store.service.StoreService;
 import com.example.lucky7.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -94,4 +97,20 @@ public class StoreController {
 //            return ResponseEntity.noContent().build();
 //        return ResponseEntity.ok().body(storeList);
 //    }
+
+    // ------------------- Kakao API 사용 ----------------------------
+    @PostMapping("/kakao")
+    public ResponseEntity<StoreResponseKakao> saveStoreWithKakao(@RequestBody StoreCreateRequestKakao request) {
+        return ResponseEntity.ok(storeService.saveKakao(request));
+    }
+
+    @GetMapping("/kakao")
+    public ResponseEntity<Page<StoreListResponseKakao>> searchStoresKakao(
+            @RequestParam String address,
+            @RequestParam int distance,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(storeService.searchStoresByDistanceKaKao(address, distance, page, size));
+    }
 }

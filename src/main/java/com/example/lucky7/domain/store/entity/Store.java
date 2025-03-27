@@ -121,4 +121,18 @@ public class Store extends Timestamped {
 //        this.storeLon = storeLon;
 //        this.storeLat = storeLat;
 //    }
+
+    // ------------------- Kakao API 사용 ----------------------------
+    @Column(nullable = false)
+    private double latitudeKakao;
+
+    @Column(nullable = false)
+    private double longitudeKakao;
+
+    public static Store fromKakao(String name, String address, StoreCategory category, double latitude, double longitude) {
+        Store store = new Store(name, address, category);
+        store.latitudeKakao = latitude;
+        store.longitudeKakao = longitude;
+        return store;
+    }
 }
