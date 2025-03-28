@@ -27,14 +27,4 @@ public class ReviewResponse {
         this.nickname = user.getNickname();
         this.storeName = store.getName();
     }
-
-    public static ReviewResponse toDto(Review review) {
-        return new ReviewResponse(
-                review.getId(),
-                review.getComments(),
-                review.getStarPoint().getPointValue(),
-                review.getUser().getNickname(),
-                review.getStore().getName()
-        );
-    }
 }
