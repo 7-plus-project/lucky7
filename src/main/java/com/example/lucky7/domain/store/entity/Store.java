@@ -69,15 +69,6 @@ public class Store extends Timestamped {
     private Point location; // Point(경도, 위도)
 
 
-    public Store(String name, String address, StoreCategory category, double longitude, double latitude) {
-        this.name = name;
-        this.address = address;
-        this.category = category;
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
-
     public Store(String name, String address, StoreCategory category, Double longitude, Double latitude) {
         this.name = name;
         this.address = address;

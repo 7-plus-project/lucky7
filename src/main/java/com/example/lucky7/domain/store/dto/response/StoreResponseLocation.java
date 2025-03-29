@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class StoreResponseKakao {
+public class StoreResponseLocation {
     private Long id;
     private String name;
     private String address;
@@ -15,8 +15,8 @@ public class StoreResponseKakao {
     private double latitude;
     private double longitude;
 
-    public static StoreResponseKakao toDto(Store store) {
-    	return new StoreResponseKakao(
+    public static StoreResponseLocation toDto(Store store) {
+    	return new StoreResponseLocation(
     		    store.getId(),
     		    store.getName(),
     		    store.getAddress(),

@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/stores")
+@RequestMapping("/api/search")
 public class SearchWithLocationController {
 
     private final SearchWithLocationService searchWithLocationService;
@@ -23,23 +23,23 @@ public class SearchWithLocationController {
 
     // ------------------- GeoHash 사용한 위치 기반 검색 (민정) ----------------------------
 
-    @GetMapping("/search/geohash")
+    @GetMapping("/geohash")
     public ResponseEntity<List<StoreResponse>> getNearByGeoHash(
-            @RequestParam(value = "longitude") double longitude,
-            @RequestParam(value = "latitude") double latitude,
+            @RequestParam String address,
             @RequestParam(value = "distance") double distance) {
-        List<StoreResponse> nearbyStores = searchWithLocationService.findNearbyGeoHash(longitude, latitude, distance);
+        List<StoreResponse> nearbyStores = searchWithLocationService.findNearbyGeoHash(address, distance);
         return ResponseEntity.ok(nearbyStores);
     }
+
+
 
     // ------------------- Mysql - GIS 사용한 위치 기반 검색 (예인)  ----------------------------
 
     @GetMapping("/gis")
     public ResponseEntity<StoreGisListResponse> getNearByGis(
-            @RequestParam(value = "lon") double lon,
-            @RequestParam(value = "lat") double lat,
+            @RequestParam String address,
             @RequestParam(value = "range") double range) {
-        StoreGisListResponse storeList = searchWithLocationService.findNearByGis(lon, lat, range);
+        StoreGisListResponse storeList = searchWithLocationService.findNearByGis(address, range);
         if (storeList.isEmpty())
             return ResponseEntity.noContent().build();
         return ResponseEntity.ok().body(storeList);

@@ -48,7 +48,13 @@ public class SearchWithLocationService {
     // ------------------- GeoHash 사용한 위치 기반 검색  ----------------------------
 
     /* GeoHash 사용한 위치 기반 가게 검색 */
-    public List<StoreResponse> findNearbyGeoHash(double longitude, double latitude, double distance) {
+    public List<StoreResponse> findNearbyGeoHash(String address, double distance) {
+
+        com.example.lucky7.external.kakao.Coordinate location = kakaoMapClient.geocode(address);
+
+        double longitude = location.longitude();
+        double latitude = location.latitude();
+
         GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
         ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
 
@@ -102,7 +108,14 @@ public class SearchWithLocationService {
     // ------------------- Mysql - GIS 사용한 위치 기반 검색 (예인)  ----------------------------
 
     /* MYSQL 위치 검색 - 메서드 추가 */
-    public StoreGisListResponse findNearByGis(double lon, double lat, double range) {
+    public StoreGisListResponse findNearByGis(String address, double range) {
+
+
+        com.example.lucky7.external.kakao.Coordinate location = kakaoMapClient.geocode(address);
+
+        double lon = location.longitude();
+        double lat = location.latitude();
+
         // 경도, 위도의 계산을 위해 km를 m로 변환
         double meterRange = range * 1000;
         // 경도, 위도에서 0.01도는 1100m인 것을 사용해 몇 m는 위도, 경도로 어느 정도인지 계산

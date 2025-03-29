@@ -2,11 +2,11 @@ package com.example.lucky7.domain.store.service;
 
 import com.example.lucky7.domain.common.exception.InvalidRequestException;
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
-import com.example.lucky7.domain.store.dto.request.StoreCreateRequestKakao;
+import com.example.lucky7.domain.store.dto.request.StoreCreateRequestLocation;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
-import com.example.lucky7.domain.store.dto.response.StoreResponseKakao;
+import com.example.lucky7.domain.store.dto.response.StoreResponseLocation;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.repository.StoreRepository;
 import com.example.lucky7.external.kakao.KakaoMapClient;
@@ -44,6 +44,8 @@ public class StoreService {
     private final StoreRepository storeRepository;
 
     private final RedisTemplate<String, String> redisTemplate;
+
+    private final KakaoMapClient kakaoMapClient;
 
 
     @Transactional
@@ -102,31 +104,40 @@ public class StoreService {
     }
 
 
-
-
-    /* 위도,경도, GeoHash, Location 포함한 가게 생성 (저장) */
     @Transactional
-    public StoreResponse saveWithGeoHash(StoreCreateRequest request){
+    public StoreResponseLocation saveWithLocation(StoreCreateRequestLocation request) {
+        Coordinate coord = kakaoMapClient.geocode(request.getAddress());
+
+        double latitude = coord.latitude();
+        double longitude = coord.longitude();
 
         Store store = new Store(
                 request.getName(),
                 request.getAddress(),
                 request.getCategory(),
-                request.getLongitude(),
-                request.getLatitude()
+                longitude,
+                latitude
         );
 
         Store savedStore = storeRepository.save(store);
-        log.info("저장된 가게 아이디 : "+savedStore.getId().toString());
+
+        saveStoreRedis(savedStore); // 레디스에 가게 정보 저장
+
+        return StoreResponseLocation.toDto(savedStore);
+
+    }
+
+
+    private void saveStoreRedis(Store store){
 
         GeoOperations<String, String> geoOps = redisTemplate.opsForGeo();
         ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
 
         String redisKey = "storeLocations"; // Geo 데이터 저장 키
-        String storeKey = "store:" + savedStore.getId(); // 개별 가게 정보 저장 키
+        String storeKey = "store:" + store.getId(); // 개별 가게 정보 저장 키
 
         // 가게의 위치 정보 저장 (Geo)
-        geoOps.add(redisKey, new Point(savedStore.getLongitude(), savedStore.getLatitude()), String.valueOf(savedStore.getId()));
+        geoOps.add(redisKey, new Point(store.getLongitude(), store.getLatitude()), String.valueOf(store.getId()));
 
         // json 형태로 가게 정보 저장
         ObjectMapper objectMapper = new ObjectMapper();
@@ -138,12 +149,12 @@ public class StoreService {
         try {
 
             Map<String, Object> storeMap = new HashMap<>();
-            storeMap.put("id", String.valueOf(savedStore.getId()));
-            storeMap.put("name", savedStore.getName());
-            storeMap.put("address", savedStore.getAddress());
-            storeMap.put("category", savedStore.getCategory());
-            storeMap.put("latitude", savedStore.getLatitude());
-            storeMap.put("longitude", savedStore.getLongitude());
+            storeMap.put("id", String.valueOf(store.getId()));
+            storeMap.put("name", store.getName());
+            storeMap.put("address", store.getAddress());
+            storeMap.put("category", store.getCategory());
+            storeMap.put("latitude", store.getLatitude());
+            storeMap.put("longitude", store.getLongitude());
 
             String storeJson = objectMapper.writeValueAsString(storeMap);
 
@@ -153,29 +164,5 @@ public class StoreService {
             e.printStackTrace();
         }
 
-        return StoreResponse.toDto(savedStore);
     }
-
-//     ------------------- kakao API ----------------------------
-
-    private final KakaoMapClient kakaoMapClient;
-
-    @Transactional
-    public StoreResponseKakao saveKakao(StoreCreateRequestKakao request) {
-        Coordinate coord = kakaoMapClient.geocode(request.getAddress());
-
-        Store store = Store.fromKakao(
-                request.getName(),
-                request.getAddress(),
-                request.getCategory(),
-                coord.latitude(),
-                coord.longitude()
-        );
-
-        Store savedStore = storeRepository.save(store);
-        return StoreResponseKakao.toDto(savedStore);
-    }
-
-
-
 }

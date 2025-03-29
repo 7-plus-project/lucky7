@@ -1,11 +1,11 @@
 package com.example.lucky7.domain.store.controller;
 
 import com.example.lucky7.domain.store.dto.request.StoreCreateRequest;
-import com.example.lucky7.domain.store.dto.request.StoreCreateRequestKakao;
+import com.example.lucky7.domain.store.dto.request.StoreCreateRequestLocation;
 import com.example.lucky7.domain.store.dto.request.StoreUpdateRequest;
 import com.example.lucky7.domain.store.dto.response.StoreListResponse;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
-import com.example.lucky7.domain.store.dto.response.StoreResponseKakao;
+import com.example.lucky7.domain.store.dto.response.StoreResponseLocation;
 import com.example.lucky7.domain.store.service.StoreService;
 import com.example.lucky7.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -63,17 +63,12 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 
-    /* 위도,경도, GeoHash, Location 포함한 가게 생성 (저장) */
+
     @PostMapping("/save-location")
-    public ResponseEntity<StoreResponse> saveWithGeoHash(@RequestBody StoreCreateRequest request) {
-        return ResponseEntity.ok(storeService.saveWithGeoHash(request));
+    public ResponseEntity<StoreResponseLocation> saveWithLocation(@RequestBody StoreCreateRequestLocation request) {
+        return ResponseEntity.ok(storeService.saveWithLocation(request));
     }
 
-    /* Kakao API 사용한 가게 생성 (저장) */
-    @PostMapping("/kakao")
-    public ResponseEntity<StoreResponseKakao> saveStoreWithKakao(@RequestBody StoreCreateRequestKakao request) {
-        return ResponseEntity.ok(storeService.saveKakao(request));
-    }
 
 
 }
