@@ -2,7 +2,7 @@ package com.example.lucky7.domain.search.repository;
 
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
-import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,29 +23,31 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     @Override
     public Page<Store> findStores(String name, StoreCategory category, Pageable pageable) {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (name != null) {
-            builder.and(store.name.like("%" + name + "%"));
-        }
-
-        if (category != null) {
-            builder.and(store.category.eq(category));
-        }
-
-        List<Store> stores = jpaQueryFactory
+        List<Store> content = jpaQueryFactory
                 .selectFrom(store)
-                .where(builder)
+                .where(
+                        Expressions.booleanTemplate("function('fulltext_match', {0}, {1}) > 0", store.name, name),
+                        category != null ? store.category.eq(category) : null
+                )
+                .orderBy(
+                        Expressions.numberTemplate(Double.class,
+                                        "function('match_score', {0}, {1})", store.name, name)
+                                .desc()
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = jpaQueryFactory
-                .selectFrom(store)
-                .where(builder)
-                .fetchCount();
+        Long total = jpaQueryFactory
+                .select(store.count())
+                .from(store)
+                .where(
+                        Expressions.booleanTemplate("function('fulltext_match', {0}, {1}) > 0", store.name, name),
+                        category != null ? store.category.eq(category) : null
+                )
+                .fetchOne();
 
-        return new PageImpl<>(stores, pageable, total);
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
     @Override
