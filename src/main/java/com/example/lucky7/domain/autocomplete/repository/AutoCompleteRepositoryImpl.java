@@ -1,4 +1,4 @@
-package com.example.lucky7.domain.autocomplete;
+package com.example.lucky7.domain.autocomplete.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import static com.example.lucky7.domain.search.entity.QSearch.search;
 
 @RequiredArgsConstructor
 @Repository
-public class AutoCompleteRepositoryImpl implements AutoCompleteRepository{
+public class AutoCompleteRepositoryImpl implements AutoCompleteRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -18,7 +18,7 @@ public class AutoCompleteRepositoryImpl implements AutoCompleteRepository{
         return jpaQueryFactory.select(search.keyword)
                 .from(search)
                 .where(search.keyword.startsWith(prefix))
-                .orderBy(search.score.desc())
+                .orderBy(search.keyword.asc()) // 사전 순으로 조회
                 .limit(limit)
                 .fetch();
     }

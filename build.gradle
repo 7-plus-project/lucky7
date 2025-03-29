@@ -67,6 +67,9 @@ dependencies {
 
     // Hibernate Spatial
     implementation 'org.hibernate.orm:hibernate-spatial:6.2.9.Final'
+
+    // WebClient 사용을 위한 WebFlux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:3.4.4'
 }
 
 // Q-class 생성 경로 지정
@@ -77,8 +80,6 @@ sourceSets {
 }
 tasks.withType(JavaCompile).configureEach {
     options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-	// WebClient 사용을 위한 WebFlux
-     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

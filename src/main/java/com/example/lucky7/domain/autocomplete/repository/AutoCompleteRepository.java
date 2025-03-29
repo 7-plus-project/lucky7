@@ -1,4 +1,4 @@
-package com.example.lucky7.domain.autocomplete;
+package com.example.lucky7.domain.autocomplete.repository;
 
 
 import java.util.List;
