@@ -21,8 +21,8 @@ public class StoreResponseKakao {
     		    store.getName(),
     		    store.getAddress(),
     		    store.getCategory(),
-    		    store.getLatitudeKakao(),
-    		    store.getLongitudeKakao()
+    		    store.getLatitude(),
+    		    store.getLongitude()
     		);
     }
 }
