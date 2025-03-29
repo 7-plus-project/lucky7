@@ -1,5 +1,6 @@
 package com.example.lucky7.domain.search.controller;
 
+import com.example.lucky7.domain.popularsearch.PopularSearchResponse;
 import com.example.lucky7.domain.search.dto.response.SearchResponse;
 import com.example.lucky7.domain.search.service.SearchService;
 import com.example.lucky7.domain.store.enums.StoreCategory;
@@ -36,5 +37,11 @@ public class SearchController {
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
         return ResponseEntity.ok(searchService.getTopKeywords(pageable));
+    }
+
+    @GetMapping("/popular-redis")
+    public ResponseEntity<PopularSearchResponse> getPopularKeywordWithRedis(@RequestParam String keyword,
+                                                                            @RequestParam(defaultValue = "5") int limit) {
+        return ResponseEntity.ok(searchService.getTopKeywordsWithRedis(keyword, limit));
     }
 }

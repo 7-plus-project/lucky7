@@ -1,5 +1,7 @@
 package com.example.lucky7.domain.search.service;
 
+import com.example.lucky7.domain.popularsearch.PopularSearchRepository;
+import com.example.lucky7.domain.popularsearch.PopularSearchResponse;
 import com.example.lucky7.domain.search.dto.response.SearchResponse;
 import com.example.lucky7.domain.search.repository.SearchRepository;
 import com.example.lucky7.domain.store.entity.Store;
@@ -19,6 +21,7 @@ public class SearchService {
 
     private final SearchRepository searchRepository;
     private final SearchCountService searchCountService;
+    private final PopularSearchRepository popularSearchRepository;
 
     @Transactional(readOnly = false)
     public Page<SearchResponse> getStores(int page, int size, String name, StoreCategory category) {
@@ -43,5 +46,9 @@ public class SearchService {
     public void resetSearchCounts() {
         searchRepository.resetAllSearchCounts();
         System.out.println("카운트 초기화");
+    }
+
+    public PopularSearchResponse getTopKeywordsWithRedis(String keyword, int limit) {
+        return new PopularSearchResponse(popularSearchRepository.getPopularSearches(keyword, limit));
     }
 }
