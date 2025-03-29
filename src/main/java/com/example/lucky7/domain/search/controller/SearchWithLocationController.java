@@ -4,6 +4,8 @@ import com.example.lucky7.domain.store.dto.response.StoreGisListResponse;
 import com.example.lucky7.domain.search.service.SearchWithLocationService;
 import com.example.lucky7.domain.store.dto.response.StoreListResponseKakao;
 import com.example.lucky7.domain.store.dto.response.StoreResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/search")
+@Tag(name = "위치 기반 식당 검색 API", description = "원하는 위치(주소)를 기준으로 주변 식당을 조회할 수 있습니다.")
 public class SearchWithLocationController {
 
     private final SearchWithLocationService searchWithLocationService;
@@ -24,6 +27,7 @@ public class SearchWithLocationController {
     // ------------------- GeoHash 사용한 위치 기반 검색 (민정) ----------------------------
 
     @GetMapping("/geohash")
+    @Operation(summary = "GeoHash + Redis", description = "GeoHash와 Redis를 적용한 위치 기반 식당 조회입니다.")
     public ResponseEntity<List<StoreResponse>> getNearByGeoHash(
             @RequestParam String address,
             @RequestParam(value = "distance") double distance) {
@@ -36,6 +40,7 @@ public class SearchWithLocationController {
     // ------------------- Mysql - GIS 사용한 위치 기반 검색 (예인)  ----------------------------
 
     @GetMapping("/gis")
+    @Operation(summary = "Mysql - GIS", description = "Mysql - GIS 사용한 위치 기반 식당 조회입니다.")
     public ResponseEntity<StoreGisListResponse> getNearByGis(
             @RequestParam String address,
             @RequestParam(value = "range") double range) {
@@ -49,6 +54,7 @@ public class SearchWithLocationController {
 
 
     @GetMapping("/kakao")
+    @Operation(summary = "kakao", description = "kakao ? 위치 기반 식당 조회입니다.")
     public ResponseEntity<Page<StoreListResponseKakao>> searchStoresKakao(
             @RequestParam String address,
             @RequestParam int distance,
