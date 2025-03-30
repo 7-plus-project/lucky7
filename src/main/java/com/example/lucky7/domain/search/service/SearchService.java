@@ -18,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SearchService {
 
     private final SearchRepository searchRepository;
@@ -62,6 +63,4 @@ public class SearchService {
 
         return new RestPage<>(responses, pageable, stores.getTotalElements());
     }
-
-
 }

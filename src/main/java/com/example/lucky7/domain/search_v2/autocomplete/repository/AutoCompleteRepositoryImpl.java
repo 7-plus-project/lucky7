@@ -1,5 +1,6 @@
-package com.example.lucky7.domain.autocomplete.repository;
+package com.example.lucky7.domain.search_v2.autocomplete.repository;
 
+import com.example.lucky7.domain.search.entity.Search;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,8 +15,8 @@ public class AutoCompleteRepositoryImpl implements AutoCompleteRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<String> getAutoComplete(String prefix, int limit) {
-        return jpaQueryFactory.select(search.keyword)
+    public List<Search> getAutoComplete(String prefix, int limit) {
+        return jpaQueryFactory.select(search)
                 .from(search)
                 .where(search.keyword.startsWith(prefix))
                 .orderBy(search.keyword.asc()) // 사전 순으로 조회

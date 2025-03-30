@@ -2,6 +2,7 @@ package com.example.lucky7.domain.autocomplete.repository;
 
 import com.example.lucky7.domain.search.entity.Search;
 import com.example.lucky7.domain.search.repository.SearchRepository;
+import com.example.lucky7.domain.search_v2.autocomplete.repository.AutoCompleteRepositoryImpl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;

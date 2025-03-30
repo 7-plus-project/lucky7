@@ -1,6 +1,7 @@
 package com.example.lucky7.domain.search.repository;
 
 import com.example.lucky7.config.RestPage;
+import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import org.springframework.data.domain.Page;
@@ -14,4 +15,5 @@ public interface SearchRepositoryCustom {
 
     RestPage<Store> findStoresWithCache(String name, StoreCategory category, Pageable pageable);
 
+    Page<StoreResponse> findStoresByDto(String name, StoreCategory category, Pageable pageable);
 }

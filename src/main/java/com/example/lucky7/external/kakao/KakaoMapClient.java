@@ -32,7 +32,7 @@ public class KakaoMapClient {
 		}
 		if (response.getDocuments().isEmpty()) {
     		throw new IllegalArgumentException("주소 검색 결과가 없습니다: " + address);
-		}        
+		}
 
         var doc = response.getDocuments().get(0);
         return new Coordinate(Double.parseDouble(doc.getY()), Double.parseDouble(doc.getX()));
