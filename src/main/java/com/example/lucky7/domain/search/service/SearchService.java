@@ -1,29 +1,29 @@
 package com.example.lucky7.domain.search.service;
 
-import com.example.lucky7.domain.popularsearch.PopularSearchRepository;
-import com.example.lucky7.domain.popularsearch.PopularSearchResponse;
+import com.example.lucky7.config.RestPage;
 import com.example.lucky7.domain.search.dto.response.SearchResponse;
 import com.example.lucky7.domain.search.repository.SearchRepository;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class SearchService {
 
     private final SearchRepository searchRepository;
     private final SearchCountService searchCountService;
-    private final PopularSearchRepository popularSearchRepository;
 
-    @Transactional(readOnly = false)
+    @Transactional
     public Page<SearchResponse> getStores(int page, int size, String name, StoreCategory category) {
         Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
         searchCountService.increaseSearchCount(name, category != null ? category.toString() : null);
@@ -48,7 +48,20 @@ public class SearchService {
         System.out.println("카운트 초기화");
     }
 
-    public PopularSearchResponse getTopKeywordsWithRedis(String keyword, int limit) {
-        return new PopularSearchResponse(popularSearchRepository.getPopularSearches(keyword, limit));
+    // ------------- redis cache 적용한 v2 search -------------
+
+    @Cacheable(value = "storeSearch", key = "#name != null ? #name : 'all' + ':' + (#category != null ? #category : 'all') + ':' + #page")
+    public RestPage<SearchResponse> findStoresWithCache(int page, int size, String name, StoreCategory category) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
+
+        RestPage<Store> stores = searchRepository.findStoresWithCache(name, category, pageable);
+
+        List<SearchResponse> responses = stores.getContent().stream()
+                .map(SearchResponse::toDto)
+                .toList();
+
+        return new RestPage<>(responses, pageable, stores.getTotalElements());
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.lucky7.domain.search.repository;
 
+import com.example.lucky7.config.RestPage;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import org.springframework.data.domain.Page;
@@ -10,5 +11,7 @@ public interface SearchRepositoryCustom {
     Page<String> findTopKeyword(Pageable pageable);
     void increaseKeywordCount(String keyword);
     void resetAllSearchCounts();
+
+    RestPage<Store> findStoresWithCache(String name, StoreCategory category, Pageable pageable);
 
 }

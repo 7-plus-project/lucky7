@@ -16,4 +16,7 @@ public class StoreUpdateRequest {
 
     private StoreCategory category;
 
+    private Double longitude;
+    private Double latitude;
+
 }

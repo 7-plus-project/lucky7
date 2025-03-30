@@ -1,5 +1,6 @@
 package com.example.lucky7.domain.search.repository;
 
+import com.example.lucky7.config.RestPage;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import com.querydsl.core.BooleanBuilder;
@@ -91,4 +92,37 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .set(search.count, 0L)
                 .execute();
     }
+
+    // ---------------------------
+
+
+    @Override
+    public RestPage<Store> findStoresWithCache(String name, StoreCategory category, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (name != null) {
+            builder.and(store.name.like("%" + name + "%"));
+        }
+
+        if (category != null) {
+            builder.and(store.category.eq(category));
+        }
+
+        List<Store> stores = jpaQueryFactory
+                .selectFrom(store)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = jpaQueryFactory
+                .selectFrom(store)
+                .where(builder)
+                .fetchCount();
+
+        return new RestPage<>(stores, pageable, total);
+
+    }
+
+
 }

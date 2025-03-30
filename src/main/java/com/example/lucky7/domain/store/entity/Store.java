@@ -19,10 +19,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 /* MYSQL 위치 검색 - 인덱스 추가 */
 @Table(name = "stores"
-     , indexes = {@Index(name = "idx_store_location", columnList = "location", unique = false)}
+//        , indexes = {@Index(name = "idx_store_location", columnList = "location", unique = false)}
 )
 @Where(clause = "deleted_at IS NULL")
 public class Store extends Timestamped {
+
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,84 +57,59 @@ public class Store extends Timestamped {
     }
 
 
-//    // ------------------- GeoHash 사용한 위치 기반 검색 시작 ----------------------------
-//
-//    private Double latitude;
-//
-//    private Double longitude;
-//
-//    private String geoHash;
-//
-//
-//    public Store(String name, String address, StoreCategory category, Double latitude, Double longitude) {
-//        this.name = name;
-//        this.address = address;
-//        this.category = category;
-//        this.latitude = latitude;
-//        this.longitude = longitude;
-//        this.geoHash = generateGeoHash(latitude, longitude);
-//    }
-//
-//
-//    private String generateGeoHash(double lat, double lon) {
-//        return GeoHash.withCharacterPrecision(lat, lon, 7).toBase32();
-//    }
-//
-//    // ------------------- GeoHash 사용한 위치 기반 검색 끝 ----------------------------
-//
-//
-//    /* MYSQL 위치 검색 - 컬럼 추가 */
-//    @Column(nullable = false)
-//    private double storeLon; // 경도
-//    @Column(nullable = false)
-//    private double storeLat; // 위도
-//
-//
-//    @Column(nullable = false, columnDefinition = "POINT SRID 4326")
-//    private Point location; // Point(경도, 위도)
-//
-//    private static final GeometryFactory geometryFactory = new GeometryFactory();
-//
-//    // storeLon, storeLat으로 location(Point) 설정
-//    public void setLocation(double storeLon, double storeLat) {
-//        this.location = geometryFactory.createPoint(new Coordinate(storeLon, storeLat));
-//        this.location.setSRID(4326);
-//    }
-//    private void ensureLocation() {
-//        this.setLocation(this.storeLon, this.storeLat);
-//    }
-//
-//    // @PrePersist: 엔티티가 처음 저장될 때 location 필드 설정
-//    @PrePersist
-//    public void prePersist() {
-//        ensureLocation();
-//    }
-//
-//    // @PreUpdate: 엔티티가 업데이트될 때 (경도/위도 값이 변경되면) 자동으로 location 필드 갱신
-//    @PreUpdate
-//    public void preUpdate() {
-//        ensureLocation();
-//    }
-//
-//    public Store(String name, String address, StoreCategory category, double storeLon, double storeLat) {
-//        this.name = name;
-//        this.address = address;
-//        this.category = category;
-//        this.storeLon = storeLon;
-//        this.storeLat = storeLat;
-//    }
+    // ------------------- 위치 기반 검색을 위한 컬럼 ----------------------------
+
+    private Double longitude; //경도 : 127. ...
+
+    private Double latitude; //위도 : 37. ...
+
+    private String geoHash;
+
+    @Column(columnDefinition = "POINT SRID 4326")
+    private Point location; // Point(경도, 위도)
+
+
+    public Store(String name, String address, StoreCategory category, Double longitude, Double latitude) {
+        this.name = name;
+        this.address = address;
+        this.category = category;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.geoHash = generateGeoHash(latitude, longitude);
+    }
+
+
+    private String generateGeoHash(double lat, double lon) {
+        return GeoHash.withCharacterPrecision(lat, lon, 7).toBase32();
+    }
+
+
+    // longitude, latitude 로 location(Point) 설정
+    public void setLocation(double longitude, double latitude) {
+        this.location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        this.location.setSRID(4326);
+    }
+    private void ensureLocation() {
+        this.setLocation(this.longitude, this.latitude);
+    }
+
+    // @PrePersist: 엔티티가 처음 저장될 때 location 필드 설정
+    @PrePersist
+    public void prePersist() {
+        ensureLocation();
+    }
+
+    // @PreUpdate: 엔티티가 업데이트될 때 (경도/위도 값이 변경되면) 자동으로 location 필드 갱신
+    @PreUpdate
+    public void preUpdate() {
+        ensureLocation();
+    }
 
     // ------------------- Kakao API 사용 ----------------------------
-    @Column(nullable = false)
-    private double latitudeKakao;
-
-    @Column(nullable = false)
-    private double longitudeKakao;
-
     public static Store fromKakao(String name, String address, StoreCategory category, double latitude, double longitude) {
         Store store = new Store(name, address, category);
-        store.latitudeKakao = latitude;
-        store.longitudeKakao = longitude;
+        store.latitude = latitude;
+        store.longitude = longitude;
         return store;
     }
 }
