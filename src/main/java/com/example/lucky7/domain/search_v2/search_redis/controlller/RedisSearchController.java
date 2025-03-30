@@ -29,16 +29,14 @@ public class RedisSearchController {
 
     // 가게 인기검색어 조회 기능
     @GetMapping("/popular")
-    public ResponseEntity<PopularSearchResponse> getPopularKeywordWithRedis(@RequestParam String keyword,
-                                                                            @RequestParam(defaultValue = "10") int limit) {
-        return ResponseEntity.ok(redisSearchService.getPopularSearches(keyword, limit));
+    public ResponseEntity<PopularSearchResponse> getPopularKeywordWithRedis(@RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(redisSearchService.getPopularSearches(limit));
     }
 
     // 가게 검색 시 자동완성 기능
     @GetMapping("/autocomplete")
-    public ResponseEntity<AutoCompleteResponse> getAutoCompleteSearches(@RequestParam String keyword,
-                                                                        @RequestParam String prefix,
+    public ResponseEntity<AutoCompleteResponse> getAutoCompleteSearches(@RequestParam String prefix,
                                                                         @RequestParam(defaultValue = "10") int limit) {
-        return ResponseEntity.ok(redisSearchService.getSuggestions(keyword, prefix, limit));
+        return ResponseEntity.ok(redisSearchService.getSuggestions(prefix, limit));
     }
 }

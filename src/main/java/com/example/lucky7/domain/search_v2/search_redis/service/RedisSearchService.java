@@ -28,31 +28,32 @@ public class RedisSearchService {
     private final SearchRepositoryCustom searchRepository;
     private final AutoCompleteRepository autoCompleteRepository;
 
+
     // 가게 조회시 redis sorted set 에 저장하기
     public Page<StoreResponse> searchStores(String name, String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        // category 값 null 일 경우 처리
-        StoreCategory storeCategory = (category != null && !category.isEmpty()) ? StoreCategory.of(category) : null;
+        // category 값이 유효한 경우만 StoreCategory 변환
+        StoreCategory storeCategory = (category != null && !category.trim().isEmpty()) ? StoreCategory.of(category) : null;
         // 가게 조회
         Page<StoreResponse> results = searchRepository.findStoresByDto(name, storeCategory, pageable);
-        // keyword 와 count sorted set 에 저장하기
-        if (category != null && category.isEmpty() ) { // name 값이 없을 경우
+        // keyword 와 count sorted set 에 저장 (공백 제외)
+        if (category != null && !category.trim().isEmpty()) {
             redisSearchRepository.incrementSearchCount(category);
         }
-        if (name != null && name.isEmpty()) { // category 값이 없을 경우
+        if (name != null && !name.trim().isEmpty()) {
             redisSearchRepository.incrementSearchCount(name);
         }
         return results;
     }
 
     // 가게 인기검색어 조회 기능
-    public PopularSearchResponse getPopularSearches(String keyword, int limit) {
-        return new PopularSearchResponse(redisSearchRepository.getPopularSearches(keyword, limit));
+    public PopularSearchResponse getPopularSearches(int limit) {
+        return new PopularSearchResponse(redisSearchRepository.getPopularSearches(limit));
     }
 
     // 자동완성 추천 검색어 조회 (Redis → DB 캐싱)
-    public AutoCompleteResponse getSuggestions(String keyword, String prefix, int limit) {
-        Set<String> redisResults = redisSearchRepository.getAutoComplete(keyword, prefix, limit);
+    public AutoCompleteResponse getSuggestions(String prefix, int limit) {
+        Set<String> redisResults = redisSearchRepository.getAutoComplete(prefix, limit);
         // Redis 데이터가 없을 경우
         if (!redisResults.isEmpty()) {
             return new AutoCompleteResponse(redisResults);

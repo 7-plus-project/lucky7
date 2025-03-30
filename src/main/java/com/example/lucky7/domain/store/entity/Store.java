@@ -112,4 +112,10 @@ public class Store extends Timestamped {
         store.longitude = longitude;
         return store;
     }
+
+    // test case 만들기 위한 생성자
+    public Store(String name, StoreCategory category) {
+        this.name = name;
+        this.category = category;
+    }
 }
