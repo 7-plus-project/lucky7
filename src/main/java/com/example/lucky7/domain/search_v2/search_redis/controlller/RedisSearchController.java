@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v2/search-redis")
+@RequestMapping("api/v2/search-redis")
 public class RedisSearchController {
 
     private final RedisSearchService redisSearchService;

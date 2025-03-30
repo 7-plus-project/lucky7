@@ -31,13 +31,15 @@ public class RedisSearchService {
     // 가게 조회시 redis sorted set 에 저장하기
     public Page<StoreResponse> searchStores(String name, String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        // category 값 null 일 경우 처리
+        StoreCategory storeCategory = (category != null && !category.isEmpty()) ? StoreCategory.of(category) : null;
         // 가게 조회
-        Page<StoreResponse> results = searchRepository.findStoresByDto(name, StoreCategory.valueOf(category), pageable);
+        Page<StoreResponse> results = searchRepository.findStoresByDto(name, storeCategory, pageable);
         // keyword 와 count sorted set 에 저장하기
-        if (name == null) { // name 값이 없을 경우
+        if (category != null && category.isEmpty() ) { // name 값이 없을 경우
             redisSearchRepository.incrementSearchCount(category);
         }
-        if (category == null) { // category 값이 없을 경우
+        if (name != null && name.isEmpty()) { // category 값이 없을 경우
             redisSearchRepository.incrementSearchCount(name);
         }
         return results;

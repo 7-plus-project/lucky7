@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(request -> request.getRequestURI().startsWith("/api/v1/admin")).hasAuthority(UserRole.Authority.ADMIN)
                         .requestMatchers(request -> request.getRequestURI().startsWith("/swagger-ui")).permitAll()
                         .requestMatchers(request -> request.getRequestURI().startsWith("/v3/api-docs")).permitAll()
+                        .requestMatchers(request -> request.getRequestURI().startsWith("/api/v2")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
