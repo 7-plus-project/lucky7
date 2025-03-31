@@ -15,11 +15,16 @@ public class Search{
 
     private String keyword;  // 이름 or 카테고리
 
-    private Long count;
+    private Long count; // sorted set - score
 
     public Search(String keyword, Long count) {
         this.keyword = keyword;
         this.count = count;
+    }
+
+    // count 수정 메서드
+    public void updateCount(Long newCount) {
+        this.count = newCount;
     }
 
 }

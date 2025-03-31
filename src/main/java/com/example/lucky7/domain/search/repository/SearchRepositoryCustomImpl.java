@@ -1,6 +1,8 @@
 package com.example.lucky7.domain.search.repository;
 
 import com.example.lucky7.config.RestPage;
+import com.example.lucky7.domain.store.dto.response.QStoreResponse;
+import com.example.lucky7.domain.store.dto.response.StoreResponse;
 import com.example.lucky7.domain.store.entity.Store;
 import com.example.lucky7.domain.store.enums.StoreCategory;
 import com.querydsl.core.BooleanBuilder;
@@ -125,6 +127,35 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
         return new RestPage<>(stores, pageable, total);
 
+    }
+
+    @Override
+    public Page<StoreResponse> findStoresByDto(String name, StoreCategory category, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (name != null) {
+            builder.and(store.name.eq(name)
+                    .or(store.name.contains(name)));
+        }
+
+        if (category != null) {
+            builder.and(store.category.eq(category));
+        }
+
+        List<StoreResponse> stores = jpaQueryFactory
+                .select(new QStoreResponse(store.id, store.name, store.address, store.category))
+                .from(store)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = jpaQueryFactory
+                .selectFrom(store)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(stores, pageable, total);
     }
 
 

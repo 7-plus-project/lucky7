@@ -62,6 +62,4 @@ public class SearchService {
 
         return new RestPage<>(responses, pageable, stores.getTotalElements());
     }
-
-
 }
