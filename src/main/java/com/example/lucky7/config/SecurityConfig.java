@@ -1,5 +1,6 @@
 package com.example.lucky7.config;
 
+import com.example.lucky7.config.jwt.JwtAuthenticationFilter;
 import com.example.lucky7.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +43,11 @@ public class SecurityConfig {
                 .rememberMe(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/health").permitAll()
-                        .requestMatchers(request -> request.getRequestURI().startsWith("/auth")).permitAll()
-                        .requestMatchers(request -> request.getRequestURI().startsWith("/admin")).hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers(request -> request.getRequestURI().startsWith("/api/v1/auth")).permitAll()
+                        .requestMatchers(request -> request.getRequestURI().startsWith("/api/v1/admin")).hasAuthority(UserRole.Authority.ADMIN)
+                        .requestMatchers(request -> request.getRequestURI().startsWith("/swagger-ui")).permitAll()
+                        .requestMatchers(request -> request.getRequestURI().startsWith("/v3/api-docs")).permitAll()
+                        .requestMatchers(request -> request.getRequestURI().startsWith("/api/v2")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
