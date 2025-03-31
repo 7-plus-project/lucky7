@@ -49,12 +49,11 @@
 
 <br>
 
-<div align=center> 
+<div align=left> 
 
 ## 📚 STACKS
 
 <br>
-<div align=left> 
   
 - **Language & Framework**: Java, Spring Boot
 - **Database**: MySQL
