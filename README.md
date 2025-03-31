@@ -18,7 +18,7 @@
 
 ### 역할 분담
 | 이름     | 역할 |
-|----------|------|
+|--------------|-------------|
 | [이민정](https://github.com/minjonyyy)   | Store CRUD,일반 검색 → Redis 적용한 성능 향상 검색 / Jmeter 사용한 성능 테스트GeoHash와 Redis 적용한 위치 기반 조회 |
 | [명민준](https://github.com/mmj-159)   | 일반 검색, 인기 검색어 기능, 검색 인덱싱 및 최적화 |
 | [이범서](https://github.com/polaris65b)   | Kakao Map API를 이용한 주소 → 좌표 변환, 위치 기반 조회 |
